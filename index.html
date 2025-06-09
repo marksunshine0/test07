@@ -140,6 +140,38 @@
         </div>
     </div>
 
+    <!-- 慎重选择弹窗 -->
+    <div id="carefulModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center transform transition-all duration-500 scale-95 opacity-0" id="carefulModalContent">
+            <div class="mb-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-yellow-100 text-yellow-500 mb-4">
+                    <i class="fa fa-exclamation-triangle text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">请慎重选择</h2>
+                <p class="text-gray-600 mb-6">小心我一拳过去~</p>
+            </div>
+            <button id="closeCarefulModal" class="bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none">
+                好的 <i class="fa fa-heart ml-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 重新思考弹窗 -->
+    <div id="rethinkModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center transform transition-all duration-500 scale-95 opacity-0" id="rethinkModalContent">
+            <div class="mb-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-500 mb-4">
+                    <i class="fa fa-refresh text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">请重新思考</h2>
+                <p class="text-gray-600 mb-6">再给你一次机会，好好回答~</p>
+            </div>
+            <button id="closeRethinkModal" class="bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none">
+                我明白了 <i class="fa fa-heart ml-1"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- 不满意弹窗 -->
     <div id="unsatisfiedModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center transform transition-all duration-500 scale-95 opacity-0" id="unsatisfiedModalContent">
@@ -147,8 +179,8 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-500 mb-4">
                     <i class="fa fa-frown-o text-3xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">你的回答我不满意 请继续作答</h2>
-                <p class="text-gray-600 mb-6">请重新选择~</p>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">你的回答我不满意</h2>
+                <p class="text-gray-600 mb-6">请珍惜最后一次机会~</p>
             </div>
             <button id="closeUnsatisfiedModal" class="bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-all duration-300 hover:scale-105 focus:outline-none">
                 好的 <i class="fa fa-heart ml-1"></i>
@@ -176,31 +208,21 @@
             const closeModal = document.getElementById('closeModal');
             const blockBackModal = document.getElementById('blockBackModal');
             const closeBlockModal = document.getElementById('closeBlockModal');
+            const carefulModal = document.getElementById('carefulModal');
+            const carefulModalContent = document.getElementById('carefulModalContent');
+            const closeCarefulModal = document.getElementById('closeCarefulModal');
+            const rethinkModal = document.getElementById('rethinkModal');
+            const rethinkModalContent = document.getElementById('rethinkModalContent');
+            const closeRethinkModal = document.getElementById('closeRethinkModal');
             const unsatisfiedModal = document.getElementById('unsatisfiedModal');
             const unsatisfiedModalContent = document.getElementById('unsatisfiedModalContent');
-            const closeUnsatisfiedModal = document.getElementById('closeUnsatisfiedModal');
+            const closeUnsatisfiedModal = document.getElementById('unsatisfiedModalContent');
             const imageModal = document.getElementById('imageModal');
             const closeImageModal = document.getElementById('closeImageModal');
             
-            let noClicks = 0; // 记录点击"没想"的次数
+            let noClicks = 0; // 记录点击"你别管"的次数
             
-            // 随机移动"没想"按钮
-            noBtn.addEventListener('mouseover', function() {
-                if (noClicks < 3) { // 只有点击次数小于3时才移动
-                    const maxX = window.innerWidth - noBtn.offsetWidth - 20;
-                    const maxY = window.innerHeight - noBtn.offsetHeight - 20;
-                    
-                    const randomX = Math.floor(Math.random() * maxX);
-                    const randomY = Math.floor(Math.random() * maxY);
-                    
-                    noBtn.style.position = 'fixed';
-                    noBtn.style.left = `${randomX}px`;
-                    noBtn.style.top = `${randomY}px`;
-                    noBtn.style.zIndex = '20';
-                }
-            });
-            
-            // 点击"没想"按钮
+            // 点击"你别管"按钮
             noBtn.addEventListener('click', function() {
                 noClicks++;
                 noBtn.classList.add('animate-shake');
@@ -209,19 +231,53 @@
                     noBtn.classList.remove('animate-shake');
                 }, 500);
                 
-                if (noClicks >= 3) {
-                    // 显示不满意弹窗
+                // 根据点击次数显示不同的弹窗
+                if (noClicks === 1) {
+                    // 第一次点击：显示慎重选择弹窗
+                    carefulModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        carefulModalContent.classList.remove('scale-95', 'opacity-0');
+                        carefulModalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                } else if (noClicks === 2) {
+                    // 第二次点击：显示重新思考弹窗
+                    rethinkModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        rethinkModalContent.classList.remove('scale-95', 'opacity-0');
+                        rethinkModalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                } else if (noClicks === 3) {
+                    // 第三次点击：显示不满意弹窗
                     unsatisfiedModal.classList.remove('hidden');
                     setTimeout(() => {
                         unsatisfiedModalContent.classList.remove('scale-95', 'opacity-0');
                         unsatisfiedModalContent.classList.add('scale-100', 'opacity-100');
                     }, 10);
                     
-                    // 禁用"没想"按钮
+                    // 禁用"你别管"按钮
                     noBtn.disabled = true;
                     noBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    noBtn.style.position = 'static';
                 }
+            });
+            
+            // 关闭慎重选择弹窗
+            closeCarefulModal.addEventListener('click', function() {
+                carefulModalContent.classList.remove('scale-100', 'opacity-100');
+                carefulModalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    carefulModal.classList.add('hidden');
+                }, 300);
+            });
+            
+            // 关闭重新思考弹窗
+            closeRethinkModal.addEventListener('click', function() {
+                rethinkModalContent.classList.remove('scale-100', 'opacity-100');
+                rethinkModalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    rethinkModal.classList.add('hidden');
+                }, 300);
             });
             
             // 关闭不满意弹窗
@@ -262,7 +318,7 @@
                 blockWechatBack();
             }
             
-            // 点击"想了"按钮
+            // 点击"想你"按钮
             yesBtn.addEventListener('click', function() {
                 // 显示成功弹窗
                 successModal.classList.remove('hidden');
